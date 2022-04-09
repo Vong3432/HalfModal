@@ -1,8 +1,10 @@
 import SwiftUI
 import UIKit
 
+
+
 /// Credits to: https://www.createwithswift.com/using-a-uisheetpresentationcontroller-in-swiftui/
-struct HalfModal<Content>: UIViewRepresentable where Content: View {
+public struct HalfModal<Content>: UIViewRepresentable where Content: View {
     @Binding var isPresented: Bool
     let onDismiss: (() -> Void)?
     let content: Content
@@ -20,7 +22,7 @@ struct HalfModal<Content>: UIViewRepresentable where Content: View {
         self.onDismiss = onDismiss
     }
     
-    func updateUIView(_ uiView: UIViewType, context: Context) {
+    public func updateUIView(_ uiView: UIViewType, context: Context) {
         let viewController = UIViewController()
         // Create the UIHostingController that will embed the SwiftUI View
         let hostingController = UIHostingController(rootView: content)
@@ -58,16 +60,16 @@ struct HalfModal<Content>: UIViewRepresentable where Content: View {
         }
     }
     
-    func makeUIView(context: Context) -> some UIView {
+    public func makeUIView(context: Context) -> some UIView {
         let view = UIView()
         return view
     }
     
-    func makeCoordinator() -> Coordinator {
+    public func makeCoordinator() -> Coordinator {
         Coordinator(isPresented: $isPresented, onDismiss: onDismiss)
     }
     
-    class Coordinator: NSObject, UISheetPresentationControllerDelegate {
+    public class Coordinator: NSObject, UISheetPresentationControllerDelegate {
         @Binding var isPresented: Bool
         let onDismiss: (() -> Void)?
         
@@ -76,7 +78,7 @@ struct HalfModal<Content>: UIViewRepresentable where Content: View {
             self.onDismiss = onDismiss
         }
         
-        func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
             isPresented = false
             if let onDismiss = onDismiss {
                 onDismiss()
