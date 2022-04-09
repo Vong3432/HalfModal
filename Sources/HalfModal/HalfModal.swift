@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 /// Credits to: https://www.createwithswift.com/using-a-uisheetpresentationcontroller-in-swiftui/
-struct HalfModalView<Content>: UIViewRepresentable where Content: View {
+struct HalfModal<Content>: UIViewRepresentable where Content: View {
     @Binding var isPresented: Bool
     let onDismiss: (() -> Void)?
     let content: Content
