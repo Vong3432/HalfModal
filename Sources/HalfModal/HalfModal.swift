@@ -10,7 +10,7 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
     let content: Content
     let detents: [UISheetPresentationController.Detent]
     
-    init(
+    public init(
         @ViewBuilder content: () -> Content,
         isPresented: Binding<Bool>,
         detents: [UISheetPresentationController.Detent] = [.large()],
