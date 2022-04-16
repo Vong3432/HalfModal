@@ -2,6 +2,20 @@ import SwiftUI
 import UIKit
 
 
+extension View {
+    public func sheet<Content>(isPresented: Binding<Bool>,detents: [UISheetPresentationController.Detent] = [.large()],
+                               selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
+                               largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
+                               cornerRadius: CGFloat = 10.0,
+                               showGrabber: Bool = false, onDismiss: (() -> Void)? = nil,
+                               @ViewBuilder content: @escaping () -> Content) -> some View where Content : View {
+        return ZStack {
+            HalfModal(content: content, isPresented: isPresented, detents: detents, selectedDetentIdentifier: selectedDetentIdentifier, largestUndimmedDetentIdentifier: largestUndimmedDetentIdentifier, cornerRadius: cornerRadius, showGrabber: showGrabber)
+            self
+        }
+    }
+}
+
 public struct HalfModal<Content>: UIViewRepresentable where Content: View {
     @Binding var isPresented: Bool
     

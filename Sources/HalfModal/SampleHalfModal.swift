@@ -10,13 +10,22 @@ struct SampleHalfModalView: View {
     @State private var presented = false
     
     var body: some View {
-        VStack {
-            HalfModal(content: {
-                Text("Detail")
-            }, isPresented: $presented, detents: [.medium(), .large()], selectedDetentIdentifier: .large, cornerRadius: 50.0, showGrabber: true)
+        NavigationView {
+            VStack {
+                Button("Tap") { presented = true }
+            }
             
-            Button("Tap") { presented = true }
+            .navigationTitle("asd")
         }
+        .sheet(
+            isPresented: $presented,
+            detents: [.medium(),.large()],
+            selectedDetentIdentifier: .large
+            ,
+            cornerRadius: 50.0,
+            showGrabber: false, content: {
+                Text("Detail")
+            })
     }
 }
 

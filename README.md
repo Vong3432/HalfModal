@@ -36,7 +36,7 @@ HalfModal(
     )
 ```
 
-### Half + Full height modal and other features from UISheetPresentationController.
+#### Half + Full height modal and other features from UISheetPresentationController.
 ```
 HalfModal(
     content: { ... }, 
@@ -45,4 +45,24 @@ HalfModal(
     selectedDetentIdentifier: .large, // default detent for the modal
     cornerRadius: 50.0, 
     showGrabber: true) 
+```
+
+#### Usage with modifiers
+```
+    NavigationView {
+        VStack {
+            Button("Tap") { presented = true }
+        }
+    }
+    .sheet(
+        isPresented: $presented,
+        detents: [.medium(),.large()],
+        selectedDetentIdentifier: .large
+        ,
+        cornerRadius: 50.0,
+        showGrabber: true, 
+        content: {
+            Text("Detail")
+        }
+    )
 ```
