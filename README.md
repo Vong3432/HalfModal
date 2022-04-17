@@ -14,7 +14,7 @@ To avoid confusion, most of the naming of the property variables will be the sam
 - selectedDetentIdentifier
 - largestUndimmedDetentIdentifier
 - preferredCornerRadius (cornerRadius in HalfModal)
-- prefersGrabberVisible
+- prefersGrabberVisible (showGrabber in HalfModal)
 
 ### Demo
 

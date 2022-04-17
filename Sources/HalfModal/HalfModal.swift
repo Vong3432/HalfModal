@@ -3,6 +3,19 @@ import UIKit
 
 
 extension View {
+    /**
+        Custom modifier that let you use HalfModal component in modifier.
+        To lookup the definition of the parameters, you may visit the documentation at <doc:HalfModal/HalfModal>
+        - Parameters:
+            - isPresented: State of modal
+            - detents: The array of heights where a sheet can rest. View more at <doc:HalfModal/HalfModal/detents>
+            - selectedDetentIdentifier: The identifier of the most recently selected detent. View more at <doc:HalfModal/HalfModal/selectedDetentIdentifier>
+            - largestUndimmedDetentIdentifier: The largest detent that doesn’t dim the view underneath the sheet. View more at <doc:HalfModal/HalfModal/largestUndimmedDetentIdentifier>
+            - cornerRadius: The corner radius that the sheet attempts to present with. View more at <doc:HalfModal/HalfModal/cornerRadius>
+            - showGrabber: A Boolean value that determines whether the sheet shows a grabber at the top. View more at <doc:HalfModal/HalfModal/showGrabber>
+            - onDismiss: Closure that calls when modal is dismissed. View more at <doc:HalfModal/HalfModal/onDismiss>
+            - content: The view inside of the modal. View more at <doc:HalfModal/HalfModal/content>
+     */
     public func sheet<Content>(isPresented: Binding<Bool>,detents: [UISheetPresentationController.Detent] = [.large()],
                                selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
                                largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
