@@ -20,8 +20,6 @@ struct SampleHalfModalView: View {
         .sheet(
             isPresented: $presented,
             detents: [.medium(),.large()],
-            selectedDetentIdentifier: .large
-            ,
             cornerRadius: 50.0,
             showGrabber: false, content: {
                 Text("Detail")
