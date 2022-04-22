@@ -83,7 +83,7 @@ extension View {
                                cornerRadius: CGFloat = 10.0,
                                showGrabber: Bool = false, onDismiss: (() -> Void)? = nil,
                                @ViewBuilder content: @escaping () -> Content) -> some View where Content : View {
-        print("\(#function) :: isPresented == \(isPresented)")
+//        print("\(#function) :: isPresented == \(isPresented)")
         return modifier(
             HalfModalViewModifier(
                 content: content,
