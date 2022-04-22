@@ -1,6 +1,68 @@
 import SwiftUI
 import UIKit
 
+struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
+    @Binding var isPresented: Bool
+    
+    /// Closure that calls when modal is dismissed.
+    public let onDismiss: (() -> Void)?
+    /// View inside the modal.
+    public let swiftUIContent: () -> MyContent
+    
+    ///  The array of heights where a sheet can rest. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801903-detents)
+    public let detents: [UISheetPresentationController.Detent]
+    
+    ///   The largest detent that doesn’t dim the view underneath the sheet. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3858107-largestundimmeddetentidentifier)
+    public let largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier?
+    
+    ///  The identifier of the most recently selected detent. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801908-selecteddetentidentifier)
+    public let selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier?
+    
+    ///  A Boolean value that determines whether the sheet shows a grabber at the top. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801906-prefersgrabbervisible)
+    public let showGrabber: Bool
+    
+    
+    ///  The corner radius that the sheet attempts to present with. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3852556-preferredcornerradius)
+    ///  Default value is 10.0
+    public let cornerRadius: CGFloat?
+    
+    init(
+        @ViewBuilder content: @escaping () -> MyContent,
+        isPresented: Binding<Bool>,
+        detents: [UISheetPresentationController.Detent] = [.large()],
+        selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
+        largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
+        cornerRadius: CGFloat = 10.0,
+        showGrabber: Bool = false,
+        onDismiss: (() -> Void)? = nil
+    ) {
+        self._isPresented = isPresented
+        self.swiftUIContent = content
+        self.detents = detents
+        self.onDismiss = onDismiss
+        self.showGrabber = showGrabber
+        self.selectedDetentIdentifier = selectedDetentIdentifier
+        self.largestUndimmedDetentIdentifier = largestUndimmedDetentIdentifier
+        self.cornerRadius = cornerRadius
+    }
+    
+    func body(content: Content) -> some View {
+        ZStack {
+            HalfModal(
+                content: swiftUIContent,
+                isPresented: $isPresented,
+                detents: detents,
+                selectedDetentIdentifier: selectedDetentIdentifier,
+                largestUndimmedDetentIdentifier: largestUndimmedDetentIdentifier,
+                cornerRadius: cornerRadius ?? 0.0,
+                showGrabber: showGrabber
+            ).fixedSize()
+            content
+        }
+    }
+}
+
+
 extension View {
     /**
      Custom modifier that let you use HalfModal component in modifier.
@@ -21,10 +83,18 @@ extension View {
                                cornerRadius: CGFloat = 10.0,
                                showGrabber: Bool = false, onDismiss: (() -> Void)? = nil,
                                @ViewBuilder content: @escaping () -> Content) -> some View where Content : View {
-        return ZStack {
-            HalfModal(content: content, isPresented: isPresented, detents: detents, selectedDetentIdentifier: selectedDetentIdentifier, largestUndimmedDetentIdentifier: largestUndimmedDetentIdentifier, cornerRadius: cornerRadius, showGrabber: showGrabber)
-            self
-        }
+        print("\(#function) :: isPresented == \(isPresented)")
+        return modifier(
+            HalfModalViewModifier(
+                content: content,
+                isPresented: isPresented,
+                detents: detents,
+                selectedDetentIdentifier: selectedDetentIdentifier,
+                largestUndimmedDetentIdentifier: largestUndimmedDetentIdentifier,
+                cornerRadius: cornerRadius,
+                showGrabber: showGrabber,
+                onDismiss: onDismiss)
+        )
     }
 }
 
@@ -111,13 +181,20 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
                 uiView.window?.rootViewController?.present(viewController, animated: true)
             }
         } else {
+            guard uniqueIdentifier == uiView.window?.rootViewController?.view.accessibilityIdentifier else {
+                return
+            }
+            
             // Dismiss the viewController
             uiView.window?.rootViewController?.dismiss(animated: true)
         }
     }
     
+    private let uniqueIdentifier = UUID().uuidString
+    
     public func makeUIView(context: Context) -> some UIView {
         let view = UIView()
+        view.accessibilityIdentifier = uniqueIdentifier
         return view
     }
     
