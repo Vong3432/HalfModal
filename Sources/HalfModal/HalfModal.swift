@@ -26,6 +26,10 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
     ///  Default value is 10.0
     public let cornerRadius: CGFloat?
     
+    /// A Boolean value that determines whether scrolling expands the sheet to a larger detent. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801907-prefersscrollingexpandswhenscrol)
+    /// Default is true
+    public let prefersScrollingExpandsWhenScrolledToEdge: Bool
+    
     init(
         @ViewBuilder content: @escaping () -> MyContent,
         isPresented: Binding<Bool>,
@@ -33,6 +37,7 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
         selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
         largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
         cornerRadius: CGFloat = 10.0,
+        prefersScrollingExpandsWhenScrolledToEdge: Bool = true,
         showGrabber: Bool = false,
         onDismiss: (() -> Void)? = nil
     ) {
@@ -44,6 +49,7 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
         self.selectedDetentIdentifier = selectedDetentIdentifier
         self.largestUndimmedDetentIdentifier = largestUndimmedDetentIdentifier
         self.cornerRadius = cornerRadius
+        self.prefersScrollingExpandsWhenScrolledToEdge = prefersScrollingExpandsWhenScrolledToEdge
     }
     
     func body(content: Content) -> some View {
@@ -55,6 +61,7 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
                 selectedDetentIdentifier: selectedDetentIdentifier,
                 largestUndimmedDetentIdentifier: largestUndimmedDetentIdentifier,
                 cornerRadius: cornerRadius ?? 0.0,
+                prefersScrollingExpandsWhenScrolledToEdge: prefersScrollingExpandsWhenScrolledToEdge,
                 showGrabber: showGrabber
             ).fixedSize()
             content
@@ -81,6 +88,7 @@ extension View {
                                selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
                                largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
                                cornerRadius: CGFloat = 10.0,
+                               prefersScrollingExpandsWhenScrolledToEdge: Bool = true,
                                showGrabber: Bool = false, onDismiss: (() -> Void)? = nil,
                                @ViewBuilder content: @escaping () -> Content) -> some View where Content : View {
 //        print("\(#function) :: isPresented == \(isPresented)")
@@ -92,6 +100,7 @@ extension View {
                 selectedDetentIdentifier: selectedDetentIdentifier,
                 largestUndimmedDetentIdentifier: largestUndimmedDetentIdentifier,
                 cornerRadius: cornerRadius,
+                prefersScrollingExpandsWhenScrolledToEdge: prefersScrollingExpandsWhenScrolledToEdge,
                 showGrabber: showGrabber,
                 onDismiss: onDismiss)
         )
@@ -123,6 +132,10 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
     ///  Default value is 10.0
     public let cornerRadius: CGFloat?
     
+    /// A Boolean value that determines whether scrolling expands the sheet to a larger detent. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801907-prefersscrollingexpandswhenscrol)
+    /// Default is true
+    public let prefersScrollingExpandsWhenScrolledToEdge: Bool
+    
     public init(
         @ViewBuilder content: () -> Content,
         isPresented: Binding<Bool>,
@@ -130,6 +143,7 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
         selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
         largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
         cornerRadius: CGFloat = 10.0,
+        prefersScrollingExpandsWhenScrolledToEdge: Bool = true,
         showGrabber: Bool = false,
         onDismiss: (() -> Void)? = nil
     ) {
@@ -141,6 +155,7 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
         self.selectedDetentIdentifier = selectedDetentIdentifier
         self.largestUndimmedDetentIdentifier = largestUndimmedDetentIdentifier
         self.cornerRadius = cornerRadius
+        self.prefersScrollingExpandsWhenScrolledToEdge = prefersScrollingExpandsWhenScrolledToEdge
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
@@ -164,7 +179,7 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
         if let sheetController = viewController.presentationController as? UISheetPresentationController {
             sheetController.detents = detents
             sheetController.prefersGrabberVisible = showGrabber
-            sheetController.prefersScrollingExpandsWhenScrolledToEdge = false
+            sheetController.prefersScrollingExpandsWhenScrolledToEdge = prefersScrollingExpandsWhenScrolledToEdge
             sheetController.largestUndimmedDetentIdentifier = largestUndimmedDetentIdentifier
             sheetController.selectedDetentIdentifier = selectedDetentIdentifier
             sheetController.preferredCornerRadius = cornerRadius
