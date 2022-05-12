@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'HalfModal'
-  s.version          = '1.5.5'
+  s.version          = '1.6.0'
   s.summary          = 'A reusable modal UISheetPresentationController component for SwiftUI'
   s.homepage         = 'https://github.com/Vong3432/HalfModal'
   s.license          = { :type => 'MIT', :file => 'LICENSE.md' }

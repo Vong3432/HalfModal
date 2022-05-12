@@ -16,6 +16,8 @@ To avoid confusion, most of the naming of the property variables will be the sam
 - preferredCornerRadius (cornerRadius in HalfModal)
 - prefersGrabberVisible (showGrabber in HalfModal)
 - prefersScrollingExpandsWhenScrolledToEdge
+- prefersEdgeAttachedInCompactHeight
+- widthFollowsPreferredContentSizeWhenEdgeAttached
 
 ### Demo
 

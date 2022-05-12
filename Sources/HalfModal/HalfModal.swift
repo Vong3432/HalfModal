@@ -30,6 +30,14 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
     /// Default is true
     public let prefersScrollingExpandsWhenScrolledToEdge: Bool
     
+    /// A Boolean value that determines whether the sheet attaches to the bottom edge of the screen in a compact-height size class. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801905-prefersedgeattachedincompactheig)
+    /// Default is false
+    public let prefersEdgeAttachedInCompactHeight: Bool
+    
+    /// A Boolean value that determines whether the sheet's width matches its view controller's preferred content size. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801911-widthfollowspreferredcontentsize)
+    /// Default is false
+    public let widthFollowsPreferredContentSizeWhenEdgeAttached: Bool
+    
     init(
         @ViewBuilder content: @escaping () -> MyContent,
         isPresented: Binding<Bool>,
@@ -38,6 +46,8 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
         largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
         cornerRadius: CGFloat = 10.0,
         prefersScrollingExpandsWhenScrolledToEdge: Bool = true,
+        prefersEdgeAttachedInCompactHeight: Bool = false,
+        widthFollowsPreferredContentSizeWhenEdgeAttached: Bool = false,
         showGrabber: Bool = false,
         onDismiss: (() -> Void)? = nil
     ) {
@@ -50,6 +60,8 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
         self.largestUndimmedDetentIdentifier = largestUndimmedDetentIdentifier
         self.cornerRadius = cornerRadius
         self.prefersScrollingExpandsWhenScrolledToEdge = prefersScrollingExpandsWhenScrolledToEdge
+        self.prefersEdgeAttachedInCompactHeight = prefersEdgeAttachedInCompactHeight
+        self.widthFollowsPreferredContentSizeWhenEdgeAttached = widthFollowsPreferredContentSizeWhenEdgeAttached
     }
     
     func body(content: Content) -> some View {
@@ -62,6 +74,8 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
                 largestUndimmedDetentIdentifier: largestUndimmedDetentIdentifier,
                 cornerRadius: cornerRadius ?? 0.0,
                 prefersScrollingExpandsWhenScrolledToEdge: prefersScrollingExpandsWhenScrolledToEdge,
+                prefersEdgeAttachedInCompactHeight: prefersEdgeAttachedInCompactHeight,
+                widthFollowsPreferredContentSizeWhenEdgeAttached: widthFollowsPreferredContentSizeWhenEdgeAttached,
                 showGrabber: showGrabber
             ).fixedSize()
             content
@@ -83,15 +97,20 @@ extension View {
      - showGrabber: A Boolean value that determines whether the sheet shows a grabber at the top. View more at <doc:HalfModal/HalfModal/showGrabber>
      - onDismiss: Closure that calls when modal is dismissed. View more at <doc:HalfModal/HalfModal/onDismiss>
      - content: The view inside of the modal. View more at <doc:HalfModal/HalfModal/content>
+     - prefersScrollingExpandsWhenScrolledToEdge: A Boolean value that determines whether scrolling expands the sheet to a larger detent. View more at <doc:HalfModal/HalfModal/prefersScrollingExpandsWhenScrolledToEdge>
+     - prefersEdgeAttachedInCompactHeight: A Boolean value that determines whether the sheet attaches to the bottom edge of the screen in a compact-height size class. <doc:HalfModal/HalfModal/prefersEdgeAttachedInCompactHeight>
+     - widthFollowsPreferredContentSizeWhenEdgeAttached: A Boolean value that determines whether the sheet's width matches its view controller's preferred content size. <doc:HalfModal/HalfModal/widthFollowsPreferredContentSizeWhenEdgeAttached>
      */
     public func sheet<Content>(isPresented: Binding<Bool>,detents: [UISheetPresentationController.Detent] = [.large()],
                                selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
                                largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
                                cornerRadius: CGFloat = 10.0,
                                prefersScrollingExpandsWhenScrolledToEdge: Bool = true,
+                               prefersEdgeAttachedInCompactHeight: Bool = false,
+                               widthFollowsPreferredContentSizeWhenEdgeAttached: Bool = false,
                                showGrabber: Bool = false, onDismiss: (() -> Void)? = nil,
                                @ViewBuilder content: @escaping () -> Content) -> some View where Content : View {
-//        print("\(#function) :: isPresented == \(isPresented)")
+        //        print("\(#function) :: isPresented == \(isPresented)")
         return modifier(
             HalfModalViewModifier(
                 content: content,
@@ -101,6 +120,8 @@ extension View {
                 largestUndimmedDetentIdentifier: largestUndimmedDetentIdentifier,
                 cornerRadius: cornerRadius,
                 prefersScrollingExpandsWhenScrolledToEdge: prefersScrollingExpandsWhenScrolledToEdge,
+                prefersEdgeAttachedInCompactHeight: prefersEdgeAttachedInCompactHeight,
+                widthFollowsPreferredContentSizeWhenEdgeAttached: widthFollowsPreferredContentSizeWhenEdgeAttached,
                 showGrabber: showGrabber,
                 onDismiss: onDismiss)
         )
@@ -136,6 +157,14 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
     /// Default is true
     public let prefersScrollingExpandsWhenScrolledToEdge: Bool
     
+    /// A Boolean value that determines whether the sheet attaches to the bottom edge of the screen in a compact-height size class. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801905-prefersedgeattachedincompactheig)
+    /// Default is false
+    public let prefersEdgeAttachedInCompactHeight: Bool
+    
+    /// A Boolean value that determines whether the sheet's width matches its view controller's preferred content size. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801911-widthfollowspreferredcontentsize)
+    /// Default is false
+    public let widthFollowsPreferredContentSizeWhenEdgeAttached: Bool
+    
     public init(
         @ViewBuilder content: () -> Content,
         isPresented: Binding<Bool>,
@@ -144,6 +173,8 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
         largestUndimmedDetentIdentifier: UISheetPresentationController.Detent.Identifier? = nil,
         cornerRadius: CGFloat = 10.0,
         prefersScrollingExpandsWhenScrolledToEdge: Bool = true,
+        prefersEdgeAttachedInCompactHeight: Bool = false,
+        widthFollowsPreferredContentSizeWhenEdgeAttached: Bool = false,
         showGrabber: Bool = false,
         onDismiss: (() -> Void)? = nil
     ) {
@@ -156,6 +187,8 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
         self.largestUndimmedDetentIdentifier = largestUndimmedDetentIdentifier
         self.cornerRadius = cornerRadius
         self.prefersScrollingExpandsWhenScrolledToEdge = prefersScrollingExpandsWhenScrolledToEdge
+        self.prefersEdgeAttachedInCompactHeight = prefersEdgeAttachedInCompactHeight
+        self.widthFollowsPreferredContentSizeWhenEdgeAttached = widthFollowsPreferredContentSizeWhenEdgeAttached
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
@@ -183,6 +216,8 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
             sheetController.largestUndimmedDetentIdentifier = largestUndimmedDetentIdentifier
             sheetController.selectedDetentIdentifier = selectedDetentIdentifier
             sheetController.preferredCornerRadius = cornerRadius
+            sheetController.prefersEdgeAttachedInCompactHeight = prefersEdgeAttachedInCompactHeight
+            sheetController.widthFollowsPreferredContentSizeWhenEdgeAttached = widthFollowsPreferredContentSizeWhenEdgeAttached
         }
         
         // Set the coordinator (delegate)
