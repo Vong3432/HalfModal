@@ -1,6 +1,178 @@
 import SwiftUI
 import UIKit
 
+// MARK: iOS 14.0 and above
+
+// MARK: View modifier
+@available(iOS 14.0, *)
+struct HalfModal14ViewModifier<MyContent>: ViewModifier where MyContent: View {
+    @Binding var isPresented: Bool
+    
+    ///  A clone version of the identifier of the most recently selected detent in UISheetPresentationControlelr from ios 15. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801908-selecteddetentidentifier)
+    public let detent: CustomPresentationControllerDetent
+    
+    /// Closure that calls when modal is dismissed.
+    public let onDismiss: (() -> Void)?
+    
+    /// View inside the modal.
+    public let swiftUIContent: () -> MyContent
+    
+    init(
+        @ViewBuilder content: @escaping () -> MyContent,
+        detent: CustomPresentationControllerDetent,
+        isPresented: Binding<Bool>,
+        cornerRadius: CGFloat = 10.0,
+        onDismiss: (() -> Void)? = nil
+    ) {
+        self._isPresented = isPresented
+        self.swiftUIContent = content
+        self.onDismiss = onDismiss
+        self.detent = detent
+    }
+    
+    func body(content: Content) -> some View {
+        ZStack {
+            HalfModalView14(
+                content: swiftUIContent,
+                isPresented: $isPresented,
+                detent: detent,
+                onDismiss: onDismiss
+            )
+            .fixedSize()
+            content
+        }
+    }
+}
+
+@available(iOS 14.0, *)
+public enum CustomPresentationControllerDetent {
+    /// A clone version of the identifier of the most recently selected detent in UISheetPresentationControlelr from ios 15. [Learn more at apple developer documentation.](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/3801903-detents)
+    
+    case medium, large
+    
+    var height: Double {
+        switch self {
+        case .medium:
+            return 0.5 // half
+        case .large:
+            return 1.0 // full
+        }
+    }
+}
+
+// MARK: View extension
+@available(iOS 14.0, *)
+extension View {
+    /**
+     Custom modifier that let you use HalfModal component in modifier.
+     To lookup the definition of the parameters, you may visit the documentation at <doc:HalfModal/HalfModalView14>
+     - Parameters:
+     - isPresented: State of modal
+     - detent: A clone version of the identifier of the most recently selected detent in UISheetPresentationControlelr from ios 15 <doc:HalfModal/CustomPresentationControllerDetent>
+     - onDismiss: Closure that calls when modal is dismissed. View more at <doc:HalfModal/HalfModalView14/onDismiss>
+     - content: The view inside of the modal. View more at <doc:HalfModal/HalfModalView14/content>
+     */
+    public func sheet<Content>(isPresented: Binding<Bool>, detent: CustomPresentationControllerDetent, onDismiss: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Content) -> some View where Content : View {
+        return modifier(
+            HalfModal14ViewModifier(
+                content: content,
+                detent: detent,
+                isPresented: isPresented,
+                onDismiss: onDismiss
+            )
+        )
+    }
+}
+
+// MARK: Half modal view
+@available(iOS 14.0, *)
+/// A reusable modal component that can be half/full height for SwiftUI for iOS 14.
+public struct HalfModalView14<Content>: UIViewControllerRepresentable where Content: View {
+    public typealias UIViewControllerType = UIViewController
+    
+    /// View inside the modal.
+    public let content: Content
+    
+    /// A clone version of the identifier of the most recently selected detent in UISheetPresentationControlelr from ios 15
+    public let detent: CustomPresentationControllerDetent
+    
+    @Binding var isPresented: Bool
+    
+    /// Closure that calls when modal is dismissed.
+    public let onDismiss: (() -> Void)?
+    
+    public init(
+        @ViewBuilder content: () -> Content,
+        isPresented: Binding<Bool>,
+        detent: CustomPresentationControllerDetent,
+        onDismiss: (() -> Void)? = nil
+    ) {
+        self._isPresented = isPresented
+        self.content = content()
+        self.detent = detent
+        self.onDismiss = onDismiss
+    }
+    
+    public func makeUIViewController(context: Context) -> UIViewController {
+        return UIViewController()
+    }
+    
+    public func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        let viewController = uiViewController
+        
+        // Create the UIHostingController that will embed the SwiftUI View
+        let hostingController = UIHostingController(rootView: content)
+        viewController.view.addSubview(hostingController.view)
+        
+        // set modal style
+        hostingController.modalPresentationStyle = .custom
+        hostingController.transitioningDelegate = context.coordinator
+        
+        if isPresented {
+            if viewController.presentedViewController == nil {
+                viewController.present(hostingController, animated: true, completion: nil)
+            }
+        } else {
+            if viewController.presentedViewController != nil {
+                viewController.dismiss(animated: true)
+            }
+        }
+    }
+    
+    
+    public func makeCoordinator() -> Coordinator {
+        Coordinator(isPresented: $isPresented, detent: detent, onDismiss: onDismiss)
+    }
+    
+    public class Coordinator: NSObject, UISheetPresentationControllerDelegate, UIViewControllerTransitioningDelegate {
+        
+        @Binding var isPresented: Bool
+        let detent: CustomPresentationControllerDetent?
+        let onDismiss: (() -> Void)?
+        
+        init(isPresented: Binding<Bool>, detent: CustomPresentationControllerDetent? = nil, onDismiss: (() -> Void)? = nil) {
+            self._isPresented = isPresented
+            self.detent = detent
+            self.onDismiss = onDismiss
+        }
+        
+        public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+            PresentationController(presentedViewController: presented, presenting: presenting, detent: detent) { [weak self] in
+                self?.isPresented = false
+                if let onDismiss = self?.onDismiss {
+                    onDismiss()
+                }
+            }
+        }
+        
+    }
+}
+
+
+// MARK: iOS 15.0 and above
+
+// MARK: View modifier
+@available(iOS 15.0, *)
 struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
     @Binding var isPresented: Bool
     
@@ -76,14 +248,16 @@ struct HalfModalViewModifier<MyContent>: ViewModifier where MyContent: View {
                 prefersScrollingExpandsWhenScrolledToEdge: prefersScrollingExpandsWhenScrolledToEdge,
                 prefersEdgeAttachedInCompactHeight: prefersEdgeAttachedInCompactHeight,
                 widthFollowsPreferredContentSizeWhenEdgeAttached: widthFollowsPreferredContentSizeWhenEdgeAttached,
-                showGrabber: showGrabber
+                showGrabber: showGrabber,
+                onDismiss: onDismiss
             ).fixedSize()
             content
         }
     }
 }
 
-
+// MARK: View extension
+@available(iOS 15.0, *)
 extension View {
     /**
      Custom modifier that let you use HalfModal component in modifier.
@@ -128,6 +302,8 @@ extension View {
     }
 }
 
+// MARK: Half Modal (iOS 15 above)
+@available(iOS 15.0, *)
 public struct HalfModal<Content>: UIViewRepresentable where Content: View {
     @Binding var isPresented: Bool
     

@@ -9,21 +9,61 @@ import SwiftUI
 struct SampleHalfModalView: View {
     @State private var presented = false
     
+    private func onDismissed() {
+        print("Dismissed")
+    }
+    
     var body: some View {
-        NavigationView {
-            VStack {
-                Button("Tap") { presented = true }
+        VStack {
+            NavigationView {
+                VStack {
+                    Button("Tap") { presented = true }
+                }
             }
+            .sheet(
+                isPresented: $presented,
+                detent: .medium,
+                onDismiss: onDismissed,
+                content: {
+                    Text("Detail")
+                }
+            )
+//            HalfModalView14(
+//                content: { Text("Content") },
+//                isPresented: $presented, detent: .large) {
+//                print("Dismissed")
+//            }
             
-            .navigationTitle("asd")
         }
-        .sheet(
-            isPresented: $presented,
-            detents: [.medium(),.large()],
-            cornerRadius: 50.0,
-            showGrabber: false, content: {
-                Text("Detail")
-            })
+        //        if #available(iOS 15.0, *) {
+        //            NavigationView {
+        //                VStack {
+        //                    Button("Tap") { presented = true }
+        //                }
+        //
+        //                .navigationTitle("asd")
+        //            }
+        //            .sheet(
+        //                isPresented: $presented,
+        //                detents: [.medium(),.large()],
+        //                cornerRadius: 50.0,
+        //                showGrabber: false, content: {
+        //                    Text("Detail")
+        //                })
+        //        } else {
+        //
+        ////            // Fallback on earlier versions
+        ////            NavigationView {
+        ////                VStack {
+        ////                    Button("Tap 14") { presented = true }
+        ////                }
+        ////
+        ////                .navigationTitle("asd")
+        ////            }
+        ////            .sheet(isPresented: $presented, detent: .medium) {
+        ////
+        ////            }
+        //        }
     }
 }
 
