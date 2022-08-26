@@ -25,7 +25,13 @@ struct SampleHalfModalView: View {
                 detent: .medium,
                 onDismiss: onDismissed,
                 content: {
-                    Text("Detail")
+                    ScrollView(.vertical) {
+                        LazyVStack {
+                            ForEach(0..<100) { _ in
+                                Text("Item")
+                            }
+                        }
+                    }
                 }
             )
 //            HalfModalView14(

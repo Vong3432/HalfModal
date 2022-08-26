@@ -96,7 +96,7 @@ class PresentationController: UIPresentationController {
     }
     
     @objc func dismissController(){
-        print("PRESS")
+//        print("PRESS")
         self.presentedViewController.dismiss(animated: true, completion: nil)
         self.onDismiss?()
     }
