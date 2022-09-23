@@ -39,6 +39,7 @@ struct HalfModal14ViewModifier<MyContent>: ViewModifier where MyContent: View {
                 onDismiss: onDismiss
             )
             .fixedSize()
+            
             content
         }
     }
@@ -87,9 +88,8 @@ extension View {
 // MARK: Half modal view
 @available(iOS 14.0, *)
 /// A reusable modal component that can be half/full height for SwiftUI for iOS 14.
-public struct HalfModalView14<Content>: UIViewControllerRepresentable where Content: View {
-    public typealias UIViewControllerType = UIViewController
-    
+public struct HalfModalView14<Content>: UIViewRepresentable where Content: View {
+
     /// View inside the modal.
     public let content: Content
     
@@ -113,32 +113,50 @@ public struct HalfModalView14<Content>: UIViewControllerRepresentable where Cont
         self.onDismiss = onDismiss
     }
     
-    public func makeUIViewController(context: Context) -> UIViewController {
-        return UIViewController()
-    }
-    
-    public func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-        let viewController = uiViewController
+    public func updateUIView(_ uiView: UIViewType, context: Context) {
+        let viewController = UIViewController()
         
         // Create the UIHostingController that will embed the SwiftUI View
         let hostingController = UIHostingController(rootView: content)
+        
+        viewController.addChild(hostingController)
         viewController.view.addSubview(hostingController.view)
         
+        // Set constraints
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        hostingController.view.leftAnchor.constraint(equalTo: viewController.view.leftAnchor).isActive = true
+        hostingController.view.topAnchor.constraint(equalTo: viewController.view.topAnchor).isActive = true
+        hostingController.view.rightAnchor.constraint(equalTo: viewController.view.rightAnchor).isActive = true
+        hostingController.view.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor).isActive = true
+        hostingController.didMove(toParent: viewController)
+        
         // set modal style
-        hostingController.modalPresentationStyle = .custom
-        hostingController.transitioningDelegate = context.coordinator
+        viewController.modalPresentationStyle = .custom
+        viewController.transitioningDelegate = context.coordinator
         
         if isPresented {
-            if viewController.presentedViewController == nil {
-                viewController.present(hostingController, animated: true, completion: nil)
+            // Prevent showing modal twice
+            if uiView.window?.rootViewController?.presentedViewController == nil {
+                // Present the viewController
+                uiView.window?.rootViewController?.present(viewController, animated: true)
             }
         } else {
-            if viewController.presentedViewController != nil {
-                viewController.dismiss(animated: true)
+            guard uniqueIdentifier == uiView.window?.rootViewController?.view.accessibilityIdentifier else {
+                return
             }
+            
+            // Dismiss the viewController
+            uiView.window?.rootViewController?.dismiss(animated: true)
         }
     }
     
+    private let uniqueIdentifier = UUID().uuidString
+    
+    public func makeUIView(context: Context) -> some UIView {
+        let view = UIView()
+        view.accessibilityIdentifier = uniqueIdentifier
+        return view
+    }
     
     public func makeCoordinator() -> Coordinator {
         Coordinator(isPresented: $isPresented, detent: detent, onDismiss: onDismiss)
