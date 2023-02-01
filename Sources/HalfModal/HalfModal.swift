@@ -114,6 +114,13 @@ public struct HalfModalView14<Content>: UIViewRepresentable where Content: View 
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
+        
+        guard isPresented else {
+            // Dismiss the viewController
+            uiView.window?.rootViewController?.dismiss(animated: true)
+            return
+        }
+        
         let viewController = UIViewController()
         
         // Create the UIHostingController that will embed the SwiftUI View
@@ -134,19 +141,10 @@ public struct HalfModalView14<Content>: UIViewRepresentable where Content: View 
         viewController.modalPresentationStyle = .custom
         viewController.transitioningDelegate = context.coordinator
         
-        if isPresented {
-            // Prevent showing modal twice
-            if uiView.window?.rootViewController?.presentedViewController == nil {
-                // Present the viewController
-                uiView.window?.rootViewController?.present(viewController, animated: true)
-            }
-        } else {
-            guard uniqueIdentifier == uiView.window?.rootViewController?.view.accessibilityIdentifier else {
-                return
-            }
-            
-            // Dismiss the viewController
-            uiView.window?.rootViewController?.dismiss(animated: true)
+        // Prevent showing modal twice
+        if uiView.window?.rootViewController?.presentedViewController == nil {
+            // Present the viewController
+            uiView.window?.rootViewController?.present(viewController, animated: true)
         }
     }
     
@@ -386,6 +384,12 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
+        guard isPresented else {
+            // Dismiss the viewController
+            uiView.window?.rootViewController?.dismiss(animated: true)
+            return
+        }
+        
         let viewController = UIViewController()
         
         // Create the UIHostingController that will embed the SwiftUI View
@@ -417,20 +421,10 @@ public struct HalfModal<Content>: UIViewRepresentable where Content: View {
         // Set the coordinator (delegate)
         // We need the delegate to use the presentationControllerDidDismiss function
         viewController.presentationController?.delegate = context.coordinator
-        
-        if isPresented {
-            // Prevent showing modal twice
-            if uiView.window?.rootViewController?.presentedViewController == nil {
-                // Present the viewController
-                uiView.window?.rootViewController?.present(viewController, animated: true)
-            }
-        } else {
-            guard uniqueIdentifier == uiView.window?.rootViewController?.view.accessibilityIdentifier else {
-                return
-            }
-            
-            // Dismiss the viewController
-            uiView.window?.rootViewController?.dismiss(animated: true)
+        // Prevent showing modal twice
+        if uiView.window?.rootViewController?.presentedViewController == nil {
+            // Present the viewController
+            uiView.window?.rootViewController?.present(viewController, animated: true)
         }
     }
     
